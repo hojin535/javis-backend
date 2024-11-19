@@ -132,4 +132,38 @@ router.delete("/:id", authenticateToken, (req, res) => {
   });
 });
 
+//mode별 개수
+
+router.get("/count", authenticateToken, (req, res) => {
+  const userId = req.user.id;
+  const query =
+    "SELECT type, COUNT(*) as count FROM Card WHERE user_id = ? GROUP BY type";
+  connection.query(query, ["hojin535"], (error, results) => {
+    if (error) {
+      console.error("카드 개수 조회 실패:", error);
+      return res.status(500).send("카드 개수 조회 중 오류가 발생했습니다.");
+    }
+    // 원하는 순서 지정
+    const order = ["경험정리", "자기소개서", "면접질문"];
+
+    // 새로운 타입 추가 함수
+    const ensureTypeExists = (array, type) => {
+      if (!array.some((item) => item.type === type)) {
+        array.push({ type, count: 0 }); // 없는 경우 추가
+      }
+    };
+
+    // 모든 타입을 배열에 추가
+    order.forEach((type) => ensureTypeExists(results, type));
+
+    // 배열 정렬
+    const sortedResults = results.sort(
+      (a, b) => order.indexOf(a.type) - order.indexOf(b.type)
+    );
+
+    console.log(sortedResults);
+    res.status(200).send(results);
+  });
+});
+
 module.exports = router;
