@@ -5,9 +5,10 @@ require("dotenv").config();
 
 const connection = require("./db"); // MySQL 연결 가져오기
 const cookieParser = require("cookie-parser");
-const userRouter = require("./route/user");
-const signUpRouter = require("./route/signUp");
-const cardRouter = require("./route/card");
+const loginRouter = require("./route/Login");
+const signUpRouter = require("./route/SignUp");
+const cardRouter = require("./route/Card");
+const commentRouter = require("./route/Comment");
 const app = express();
 const port = 3000;
 
@@ -21,9 +22,11 @@ app.use(
 app.use(express.json());
 app.use(cookieParser());
 // 라우터 등록
-app.use("/Login", userRouter);
+app.use("/Login", loginRouter);
 app.use("/Signup", signUpRouter);
 app.use("/Card", cardRouter);
+app.use("/Comment", commentRouter);
+
 connection.connect((err) => {
   if (err) {
     console.error("MySQL 연결 실패: ", err);
