@@ -10,26 +10,46 @@ const router = express.Router();
  */
 router.post("/", authenticateToken, (req, res) => {
   const userId = req.user.id; // JWT에서 추출한 사용자 ID
-  const { title, tags, mode, type } = req.body;
+  const { title, tags, mode, type, recruitId } = req.body;
   console.log(tags);
-  const query = `
-    INSERT INTO Card (user_id, title, date, tags, mode,type) 
+  console.log(recruitId, "공고아이디");
+  if (recruitId) {
+    const query = `
+    INSERT INTO Card (user_id, title, date, tags, mode,type,recruit_id) 
+    VALUES (?, ?, NOW(), ?, ?, ?,?)`;
+
+    connection.query(
+      query,
+      [userId, title, JSON.stringify(tags) || null, mode, type, recruitId],
+      (error, results) => {
+        if (error) {
+          console.error("카드 추가 실패:", error);
+          return res.status(500).send("카드 추가 중 오류가 발생했습니다.");
+        }
+        res
+          .status(201)
+          .send({ message: "카드 추가 성공", cardId: results.insertId });
+      }
+    );
+  } else {
+    const query = `
+    INSERT INTO Card (user_id, title, date, tags, mode,type)
     VALUES (?, ?, NOW(), ?, ?, ?)`;
 
-  connection.query(
-    query,
-    [userId, title, JSON.stringify(tags) || null, mode, type],
-    (error, results) => {
-      if (error) {
-        console.error("카드 추가 실패:", error);
-        return res.status(500).send("카드 추가 중 오류가 발생했습니다.");
+    connection.query(
+      query,
+      [userId, title, JSON.stringify(tags) || null, mode, type],
+      (error, results) => {
+        if (error) {
+          console.error("카드 추가 실패:", error);
+          return res.status(500).send("카드 추가 중 오류가 발생했습니다.");
+        }
+        res
+          .status(201)
+          .send({ message: "카드 추가 성공", cardId: results.insertId });
       }
-
-      res
-        .status(201)
-        .send({ message: "카드 추가 성공", cardId: results.insertId });
-    }
-  );
+    );
+  }
 });
 
 /**
@@ -73,6 +93,25 @@ router.get("/All", authenticateToken, (req, res) => {
   });
 });
 
+// recruit용 카드 조회
+router.get("/recruit/:id", authenticateToken, (req, res) => {
+  const userId = req.user.id;
+  const recruitId = req.params.id;
+  console.log(userId);
+  const mode = req.query.mode;
+  const type = req.query.type;
+  const query =
+    "SELECT * FROM Card WHERE user_id = ?and recruit_id = ? and mode = ? and type = ? ";
+
+  connection.query(query, [userId, recruitId, mode, type], (error, results) => {
+    if (error) {
+      console.error("카드 조회 실패:", error);
+      return res.status(500).send("카드 조회 중 오류가 발생했습니다.");
+    }
+    res.status(200).send(results);
+  });
+});
+
 /**
  * 3. 카드 수정
  * PUT /cards/:id
@@ -84,27 +123,23 @@ router.put("/:id", authenticateToken, (req, res) => {
 
   const query = `
     UPDATE Card
-    SET title = ?, text = ?, mode = ?
+    SET title = ?, text = ?
     WHERE id = ? AND user_id = ?`;
 
-  connection.query(
-    query,
-    [title, text, "statement", cardId, userId],
-    (error, results) => {
-      if (error) {
-        console.error("카드 수정 실패:", error);
-        return res.status(500).send("카드 수정 중 오류가 발생했습니다.");
-      }
-
-      if (results.affectedRows === 0) {
-        return res
-          .status(404)
-          .send("해당 카드를 찾을 수 없거나 수정 권한이 없습니다.");
-      }
-
-      res.status(200).send({ message: "카드 수정 성공" });
+  connection.query(query, [title, text, cardId, userId], (error, results) => {
+    if (error) {
+      console.error("카드 수정 실패:", error);
+      return res.status(500).send("카드 수정 중 오류가 발생했습니다.");
     }
-  );
+
+    if (results.affectedRows === 0) {
+      return res
+        .status(404)
+        .send("해당 카드를 찾을 수 없거나 수정 권한이 없습니다.");
+    }
+
+    res.status(200).send({ message: "카드 수정 성공" });
+  });
 });
 
 /**
@@ -136,9 +171,48 @@ router.delete("/:id", authenticateToken, (req, res) => {
 
 router.get("/count", authenticateToken, (req, res) => {
   const userId = req.user.id;
+  const mode = req.query.mode;
+  console.log("mode:", mode);
   const query =
-    "SELECT type, COUNT(*) as count FROM Card WHERE user_id = ? GROUP BY type";
-  connection.query(query, ["hojin535"], (error, results) => {
+    "SELECT type, COUNT(*) as count FROM Card WHERE user_id = ? AND mode= ? GROUP BY type";
+  connection.query(query, [userId, mode], (error, results) => {
+    if (error) {
+      console.error("카드 개수 조회 실패:", error);
+      return res.status(500).send("카드 개수 조회 중 오류가 발생했습니다.");
+    }
+    // 원하는 순서 지정
+    const order = ["경험정리", "자기소개서", "면접질문"];
+
+    // 새로운 타입 추가 함수
+    const ensureTypeExists = (array, type) => {
+      if (!array.some((item) => item.type === type)) {
+        array.push({ type, count: 0 }); // 없는 경우 추가
+      }
+    };
+
+    // 모든 타입을 배열에 추가
+    order.forEach((type) => ensureTypeExists(results, type));
+
+    // 배열 정렬
+    const sortedResults = results.sort(
+      (a, b) => order.indexOf(a.type) - order.indexOf(b.type)
+    );
+
+    console.log(sortedResults);
+    res.status(200).send(results);
+  });
+});
+
+//recruit에 속한 카드 필터메뉴 개수
+router.get("/recruit/count/:id", authenticateToken, (req, res) => {
+  const userId = req.user.id;
+  const recruitId = req.params.id;
+  const mode = req.query.mode;
+  console.log("mode:", mode);
+  console.log("recruitId:", recruitId);
+  const query =
+    "SELECT type, COUNT(*) as count FROM Card WHERE user_id = ?AND recruit_id= ? AND mode= ?  GROUP BY type";
+  connection.query(query, [userId, recruitId, mode], (error, results) => {
     if (error) {
       console.error("카드 개수 조회 실패:", error);
       return res.status(500).send("카드 개수 조회 중 오류가 발생했습니다.");

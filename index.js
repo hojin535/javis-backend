@@ -9,6 +9,7 @@ const loginRouter = require("./route/Login");
 const signUpRouter = require("./route/SignUp");
 const cardRouter = require("./route/Card");
 const commentRouter = require("./route/Comment");
+const recruitRouter = require("./route/Recruit");
 const app = express();
 const port = 3000;
 
@@ -26,7 +27,7 @@ app.use("/Login", loginRouter);
 app.use("/Signup", signUpRouter);
 app.use("/Card", cardRouter);
 app.use("/Comment", commentRouter);
-
+app.use("/Recruit", recruitRouter);
 connection.connect((err) => {
   if (err) {
     console.error("MySQL 연결 실패: ", err);
