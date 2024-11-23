@@ -26,6 +26,36 @@ router.get("/", authenticateToken, (req, res) => {
     res.status(200).send(transformedResults);
   });
 });
+//side메뉴용
+router.get("/side", authenticateToken, (req, res) => {
+  console.log("야야");
+  const userId = req.user.id;
+
+  const query = `SELECT
+  R.id AS id,
+  R.title AS title,
+  JSON_ARRAYAGG(
+    JSON_OBJECT(
+      'id', C.id,
+      'title', C.title,
+      'type',C.type
+    )
+  ) AS cards
+FROM Recruit R
+LEFT JOIN Card C ON R.id = C.recruit_id
+WHERE R.user_id = ?
+GROUP BY R.id, R.title`;
+
+  connection.query(query, [userId], (error, results) => {
+    if (error) {
+      console.error("공고 조회 실패:", error);
+      return res.status(500).send("공고 조회 중 오류가 발생했습니다.");
+    }
+    console.log(results);
+    res.status(200).json(results);
+  });
+});
+
 router.get("/:id", authenticateToken, (req, res) => {
   const userId = req.user.id;
   const id = req.params.id;
@@ -204,6 +234,7 @@ router.put("/url/:id", authenticateToken, (req, res) => {
     res.status(200).send({ message: "공고 url 수정 성공" });
   });
 });
+
 router.put("/deadline/:id", authenticateToken, (req, res) => {
   const userId = req.user.id;
   const RecruitId = req.params.id;
