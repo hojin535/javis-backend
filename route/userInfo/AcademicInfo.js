@@ -28,9 +28,9 @@ router.put("/", authenticateToken, async (req, res) => {
     Key: {
       userId: { S: userId }
     },
-    UpdateExpression: "SET academicInfoRouter = :academicInfoRouter",
+    UpdateExpression: "SET academicInfo = :academicInfo",
     ExpressionAttributeValues: {
-      ":academicInfoRouter": {
+      ":academicInfo": {
         M: {
             schoolName: { S: schoolName },
             studyStartDate: {S: studyStartDate},

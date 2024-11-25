@@ -15,7 +15,7 @@ router.put("/", authenticateToken, async (req, res) => {
         awardName: { S: item.awardName || "" },
         awardingInstitution: { S: item.awardingInstitution || "" },
         awardDate: { S: item.awardDate || "" },
-      endDawardDetailsate: { S: item.awardDetails || "" },
+        awardDetail: { S: item.awardDetails || "" },
       remarks: { S: item.remarks || "" },
     },
   }));

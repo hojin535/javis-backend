@@ -16,6 +16,7 @@ const militaryInfoRouter = require("./route/userInfo/MilitaryInfo");
 const academicInfoRouter = require("./route/userInfo/AcademicInfo");
 const clubInfoRouter = require("./route/userInfo/ClubInfo");
 const awardInfoRouter = require("./route/userInfo/AwardInfo");
+const userInfoRouter = require("./route/userInfo/UserInfo");
 const app = express();
 const port = 3000;
 
@@ -40,6 +41,7 @@ app.use("/MilitaryInfo",militaryInfoRouter);
 app.use("/AcademicInfo",academicInfoRouter);
 app.use("/ClubInfo",clubInfoRouter);
 app.use("/AwardInfo",awardInfoRouter);
+app.use("/UserInfo",userInfoRouter);
 connection.connect((err) => {
   if (err) {
     console.error("MySQL 연결 실패: ", err);
