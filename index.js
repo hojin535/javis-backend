@@ -11,6 +11,11 @@ const cardRouter = require("./route/Card");
 const commentRouter = require("./route/Comment");
 const recruitRouter = require("./route/Recruit");
 const searchRouter = require("./route/Search");
+const basicInfoRouter = require("./route/userInfo/BasicInfo");
+const militaryInfoRouter = require("./route/userInfo/MilitaryInfo");
+const academicInfoRouter = require("./route/userInfo/AcademicInfo");
+const clubInfoRouter = require("./route/userInfo/ClubInfo");
+const awardInfoRouter = require("./route/userInfo/AwardInfo");
 const app = express();
 const port = 3000;
 
@@ -30,6 +35,11 @@ app.use("/Card", cardRouter);
 app.use("/Comment", commentRouter);
 app.use("/Recruit", recruitRouter);
 app.use("/Search", searchRouter);
+app.use("/BasicInfo",basicInfoRouter);
+app.use("/MilitaryInfo",militaryInfoRouter);
+app.use("/AcademicInfo",academicInfoRouter);
+app.use("/ClubInfo",clubInfoRouter);
+app.use("/AwardInfo",awardInfoRouter);
 connection.connect((err) => {
   if (err) {
     console.error("MySQL 연결 실패: ", err);
