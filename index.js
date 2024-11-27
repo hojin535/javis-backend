@@ -31,7 +31,7 @@ app.use(express.json());
 app.use(cookieParser());
 // 라우터 등록
 app.use("/Login", loginRouter);
-app.use("/Signup", signUpRouter);
+app.use("/SignUp", signUpRouter);
 app.use("/Card", cardRouter);
 app.use("/Comment", commentRouter);
 app.use("/Recruit", recruitRouter);
