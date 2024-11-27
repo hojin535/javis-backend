@@ -23,7 +23,7 @@ const port = 3000;
 // 미들웨어
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL, // 프론트엔드의 URL
+    origin: process.env.VITE_FRONTEND_URL, // 프론트엔드의 URL
     credentials: true, // 쿠키 전송 허용
   })
 );
