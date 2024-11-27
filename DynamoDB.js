@@ -11,7 +11,7 @@ const {
 } = require("@aws-sdk/client-dynamodb");
 
 const client = new DynamoDBClient({
-  region: "ap-northeast-2", // DynamoDB 테이블의 리전
+  region: process.env.DYNAMO_REGION,
   credentials: {
     accessKeyId: process.env.DYNAMO_DB, // .env에서 가져온 AWS Access Key ID
     secretAccessKey: process.env.DYNAMO_SECRET, // .env에서 가져온 AWS Secret Access Key
