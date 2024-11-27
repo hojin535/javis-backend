@@ -26,7 +26,6 @@ function parseDynamoDBData(data) {
   }
 router.get("/", authenticateToken, async (req, res) => {
     const userId = req.user.id;
-  
     const params = {
       TableName: "javis",
       Key: {
