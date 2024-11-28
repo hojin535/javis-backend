@@ -28,20 +28,16 @@ console.log(process.env.VITE_PASSWORD);
 console.log(process.env.VITE_DATABASE);
 
 // CORS 프리플라이트 요청 처리
-app.options('*', cors());
+const corsOptions = {
+  origin: 'https://javisproject.duckdns.org',
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
+  exposedHeaders: ['Set-Cookie'],
+};
 
-// 미들웨어
-app.use(
-  cors({
-    origin: 'https://javisproject.duckdns.org',
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
-    exposedHeaders: ['Set-Cookie'],
-    preflightContinue: false,
-    optionsSuccessStatus: 204
-  })
-);
+app.use(cors(corsOptions));
+app.options('/Login', cors(corsOptions));
 
 // CORS 헤더 추가 미들웨어
 app.use((req, res, next) => {
@@ -49,6 +45,9 @@ app.use((req, res, next) => {
   res.header('Access-Control-Allow-Credentials', 'true');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Cookie');
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
   next();
 });
 
