@@ -38,7 +38,7 @@ router.post("/", (req, res) => {
 
     // JWT 생성 및 쿠키 저장
     const user = { id: results[0].id, name: results[0].name };
-    const token = jwt.sign(user, process.env.JWT_SECRET, { expiresIn: "1h" });
+    const token = jwt.sign(user, process.env.VITE_JWT_SECRET, { expiresIn: "1h" });
 
     res.cookie("token", token, {
       httpOnly: true,
