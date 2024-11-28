@@ -2,17 +2,35 @@ const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
 const authenticateToken = (req, res, next) => {
-  const token = req.cookies.token; // 쿠키에서 토큰 가져오기
+  const authHeader = req.headers['authorization'];
+  const accessToken = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN 형식에서 토큰 추출
 
-  if (!token) {
-    return res.status(401).send("토큰이 없습니다. 인증이 필요합니다.");
+  if (!accessToken) {
+    return res.status(401).json({ 
+      message: '액세스 토큰이 없습니다.', 
+      needRefresh: true 
+    });
   }
 
-  jwt.verify(token, process.env.VITE_JWT_SECRET, (err, user) => {
+  jwt.verify(accessToken, process.env.VITE_JWT_SECRET, (err, decoded) => {
     if (err) {
-      return res.status(403).send("유효하지 않은 토큰입니다.");
+      // 토큰이 만료된 경우
+      if (err.name === 'TokenExpiredError') {
+        return res.status(401).json({ 
+          message: '액세스 토큰이 만료되었습니다.', 
+          needRefresh: true,
+          error: 'EXPIRED_TOKEN'
+        });
+      }
+      // 토큰이 유효하지 않은 경우
+      return res.status(401).json({ 
+        message: '유효하지 않은 액세스 토큰입니다.', 
+        needRefresh: true,
+        error: 'INVALID_TOKEN'
+      });
     }
-    req.user = user; // 인증된 사용자 정보 저장
+
+    req.user = decoded;
     next();
   });
 };

@@ -20,10 +20,16 @@ const userInfoRouter = require("./route/userInfo/UserInfo");
 const app = express();
 const port = 3000;
 
+// CORS 설정
+const corsOptions = {
+  origin: [process.env.VITE_FRONTEND_URL, 'http://localhost:5173'],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+};
 
-// app.use(cors(corsOptions));
-// app.options('/Login', cors(corsOptions));
-
+app.use(cors(corsOptions));
+///////////
 app.use(express.json());
 app.use(cookieParser());
 // 라우터 등록

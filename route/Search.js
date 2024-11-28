@@ -10,56 +10,60 @@ const queryAsync = util.promisify(connection.query).bind(connection);
 
 router.get("/tag", authenticateToken, async (req, res) => {
   const userId = req.user.id;
-  let data;
+  const { tags } = req.query;
+  
   try {
-    // JSON 문자열을 파싱하여 배열로 변환
-    data = JSON.parse(req.query.data);
-  } catch (error) {
-    return res.status(400).send("유효하지 않은 JSON 데이터입니다.");
-  }
+    // URL 디코딩 후 JSON 파싱
+    const tagArray = JSON.parse(decodeURIComponent(tags));
+    console.log(tagArray);
 
-  console.log("dtatat:", data);
-
-  const conditions = [];
-  const values = [userId]; // user_id를 먼저 추가
-
-  // 조건 생성
-  data.forEach((item) => {
-    if (item.tag && item.type) {
-      const jsonCondition = JSON.stringify({ tag: item.tag, type: item.type });
-      conditions.push(`JSON_CONTAINS(tags, ?)`); // JSON 조건 추가
-      values.push(jsonCondition); // JSON 객체를 문자열로 추가
+    // 태그 배열이 유효한지 확인
+    if (!Array.isArray(tagArray)) {
+      return res.status(400).json({ message: "태그는 배열 형식이어야 합니다." });
     }
-  });
 
-  if (conditions.length === 0) {
-    return res.status(400).send("유효한 tag와 type이 없습니다.");
-  }
+    // 각 태그 객체에 대해 JSON 검색 조건 생성
+    const conditions = tagArray.map(tagObj => {
+      const jsonToMatch = JSON.stringify({ tag: tagObj.tag, type: tagObj.type });
+      return `JSON_CONTAINS(tags, '${jsonToMatch}')`;
+    }).join(' OR ');
 
-  // SQL 쿼리 생성
-  const queryStatement = `
-    SELECT * FROM Card
-    WHERE user_id = ? AND mode="statement" AND (${conditions.join(" OR ")})
-  `;
-  const queryRecruit = `
-    SELECT * FROM Card
-    WHERE user_id = ? AND mode="recruit" AND (${conditions.join(" OR ")})
-  `;
+    const statementQuery = `
+      SELECT * FROM Card 
+      WHERE user_id = ? 
+      AND mode = 'statement' 
+      AND (${conditions})
+    `;
 
-  try {
-    // 두 쿼리를 병렬로 실행
-    const [statement, recruit] = await Promise.all([
-      queryAsync(queryStatement, values),
-      queryAsync(queryRecruit, values),
+    const recruitQuery = `
+      SELECT * FROM Card 
+      WHERE user_id = ? 
+      AND mode = 'recruit' 
+      AND (${conditions})
+    `;
+
+    console.log('SQL Query:', statementQuery);
+
+    const [statementResults, recruitResults] = await Promise.all([
+      queryAsync(statementQuery, [userId]),
+      queryAsync(recruitQuery, [userId])
     ]);
 
-    // 결과 반환
-    res.status(200).send({ statement, recruit });
+    res.json({
+        statement: statementResults,
+        recruit: recruitResults
+      }
+    );
+
   } catch (error) {
-    console.error("카드 조회 실패:", error);
-    res.status(500).send("카드 조회 중 오류가 발생했습니다.");
+    console.error("검색 에러:", error);
+    res.status(500).json({ 
+      message: "검색 중 오류가 발생했습니다.",
+      error: error.message 
+    });
   }
 });
+
 // 검색
 router.get("", authenticateToken, async (req, res) => {
   const userId = req.user.id;
