@@ -30,8 +30,10 @@ console.log(process.env.VITE_DATABASE);
 // 미들웨어
 app.use(
   cors({
-    origin: process.env.VITE_FRONTEND_URL, // 프론트엔드의 URL
-    credentials: true, // 쿠키 전송 허용
+    origin: ['https://javisproject.duckdns.org'],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
   })
 );
 app.use(express.json());
