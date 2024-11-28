@@ -20,6 +20,13 @@ const userInfoRouter = require("./route/userInfo/UserInfo");
 const app = express();
 const port = 3000;
 
+console.log(process.env.VITE_FRONTEND_URL);
+console.log(process.env.VITE_HOST); // process.env.VITE_HOST, // DuckDNS 도메인만
+console.log(process.env.VITE_PORT); // 포트를 별도로 지정
+console.log(process.env.VITE_USER);
+console.log(process.env.VITE_PASSWORD);
+console.log(process.env.VITE_DATABASE);
+
 // 미들웨어
 app.use(
   cors({

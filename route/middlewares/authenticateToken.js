@@ -8,7 +8,7 @@ const authenticateToken = (req, res, next) => {
     return res.status(401).send("토큰이 없습니다. 인증이 필요합니다.");
   }
 
-  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+  jwt.verify(token, process.env.VITE_JWT_SECRET, (err, user) => {
     if (err) {
       return res.status(403).send("유효하지 않은 토큰입니다.");
     }
