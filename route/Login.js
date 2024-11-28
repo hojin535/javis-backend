@@ -42,8 +42,8 @@ router.post("/", (req, res) => {
 
     res.cookie("token", token, {
       httpOnly: true,
-      // secure: process.env.NODE_ENV === "production", // HTTPS 환경에서만 활성화
-      sameSite: "strict", // CSRF 방지
+      secure: true, // HTTPS 환경에서 쿠키 전송 활성화
+      sameSite: 'none', // cross-site 요청 허용
       maxAge: 60 * 60 * 1000, // 1시간
     });
 
