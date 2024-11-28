@@ -7,7 +7,8 @@ const {
   UpdateItemCommand,
   DeleteItemCommand,
   ScanCommand,
-  QueryCommand
+  QueryCommand,
+  ListTablesCommand
 } = require("@aws-sdk/client-dynamodb");
 
 const client = new DynamoDBClient({
@@ -25,5 +26,6 @@ module.exports = {
   QueryCommand,      // Read (조건 기반 검색)
   ScanCommand,       // Read (전체 테이블 스캔)
   UpdateItemCommand, // Update
-  DeleteItemCommand  // Delete
+  DeleteItemCommand, // Delete
+  ListTablesCommand  // List Tables
 };

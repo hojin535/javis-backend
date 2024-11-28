@@ -20,16 +20,6 @@ const userInfoRouter = require("./route/userInfo/UserInfo");
 const app = express();
 const port = 3000;
 
-console.log(process.env.VITE_FRONTEND_URL);
-console.log(process.env.VITE_HOST); // process.env.VITE_HOST, // DuckDNS 도메인만
-console.log(process.env.VITE_PORT); // 포트를 별도로 지정
-console.log(process.env.VITE_USER);
-console.log(process.env.VITE_PASSWORD);
-console.log(process.env.VITE_DATABASE);
-console.log(process.env.VITE_DYNAMO_REGION);
-console.log(process.env.VITE_DYNAMO_DB);
-console.log(process.env.VITE_DYNAMO_SECRET);
-
 
 // app.use(cors(corsOptions));
 // app.options('/Login', cors(corsOptions));
@@ -49,21 +39,54 @@ app.use("/AcademicInfo",academicInfoRouter);
 app.use("/ClubInfo",clubInfoRouter);
 app.use("/AwardInfo",awardInfoRouter);
 app.use("/UserInfo",userInfoRouter);
-connection.connect((err) => {
-  if (err) {
-    console.error("MySQL 연결 실패: ", err);
-    process.exit();
-  } else {
-    console.log("MySQL 연결 성공");
+
+// DynamoDB 연결 테스트
+const { client, ListTablesCommand } = require('./DynamoDB');
+const testDynamoDB = async () => {
+  try {
+    const command = new ListTablesCommand({});
+    const response = await client.send(command);
+    console.log('DynamoDB 연결 성공. 테이블 목록:', response.TableNames);
+    return true;
+  } catch (error) {
+    console.error('DynamoDB 연결 실패:', error.message);
+    return false;
   }
-});
+};
+
+// MySQL과 DynamoDB 연결 확인
+const checkConnections = async () => {
+  try {
+    // MySQL 연결 확인
+    connection.connect((err) => {
+      if (err) {
+        console.error("MySQL 연결 실패: ", err);
+        process.exit(1);
+      }
+      console.log("MySQL 연결 성공");
+    });
+
+    // DynamoDB 연결 확인
+    const dynamoDBConnected = await testDynamoDB();
+    if (!dynamoDBConnected) {
+      console.error("DynamoDB 연결 실패로 서버를 종료합니다.");
+      process.exit(1);
+    }
+
+    // 모든 연결이 성공하면 서버 시작
+    app.listen(port, () => {
+      console.log(`서버가 실행 중입니다. 포트: ${port}`);
+    });
+  } catch (error) {
+    console.error("서버 시작 실패:", error);
+    process.exit(1);
+  }
+};
 
 // 기본 라우터
 app.get("/", (req, res) => {
   res.send("Hello World");
 });
 
-// 서버 실행
-app.listen(port, () => {
-  console.log(`서버가 실행 중입니다. 포트: ${port}`);
-});
+// 서버 시작
+checkConnections();
