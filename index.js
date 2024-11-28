@@ -26,6 +26,9 @@ console.log(process.env.VITE_PORT); // 포트를 별도로 지정
 console.log(process.env.VITE_USER);
 console.log(process.env.VITE_PASSWORD);
 console.log(process.env.VITE_DATABASE);
+console.log(process.env.VITE_DYNAMO_REGION);
+console.log(process.env.VITE_DYNAMO_DB);
+console.log(process.env.VITE_DYNAMO_SECRET);
 
 
 // app.use(cors(corsOptions));
