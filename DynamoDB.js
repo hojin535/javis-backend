@@ -11,10 +11,10 @@ const {
 } = require("@aws-sdk/client-dynamodb");
 
 const client = new DynamoDBClient({
-  region: process.env.DYNAMO_REGION,
+  region: process.env.VITE_DYNAMO_REGION,
   credentials: {
-    accessKeyId: process.env.DYNAMO_DB, // .env에서 가져온 AWS Access Key ID
-    secretAccessKey: process.env.DYNAMO_SECRET, // .env에서 가져온 AWS Secret Access Key
+    accessKeyId: process.env.VITE_DYNAMO_DB, // .env에서 가져온 AWS Access Key ID
+    secretAccessKey: process.env.VITE_DYNAMO_SECRET, // .env에서 가져온 AWS Secret Access Key
   },
 });
 
