@@ -17,13 +17,13 @@ const client = new DynamoDBClient({
     accessKeyId: process.env.VITE_DYNAMO_DB, // .env에서 가져온 AWS Access Key ID
     secretAccessKey: process.env.VITE_DYNAMO_SECRET, // .env에서 가져온 AWS Secret Access Key
   },
-}).on('error', (error) => {
-  console.error('DynamoDB 연결 에러:', error);
-  console.log('현재 설정:', {
-    region: process.env.VITE_DYNAMO_REGION,
-    accessKeyId: process.env.VITE_DYNAMO_DB ? '설정됨' : '설정되지 않음',
-    secretAccessKey: process.env.VITE_DYNAMO_SECRET ? '설정됨' : '설정되지 않음'
-  });
+});
+
+// 연결 설정 로깅
+console.log('DynamoDB 설정:', {
+  region: process.env.VITE_DYNAMO_REGION,
+  accessKeyId: process.env.VITE_DYNAMO_DB ? '설정됨' : '설정되지 않음',
+  secretAccessKey: process.env.VITE_DYNAMO_SECRET ? '설정됨' : '설정되지 않음'
 });
 
 module.exports = {
