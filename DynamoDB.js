@@ -21,9 +21,9 @@ const client = new DynamoDBClient({
 
 // 연결 설정 로깅
 console.log('DynamoDB 설정:', {
-  region: process.env.VITE_DYNAMO_REGION,
-  accessKeyId: process.env.VITE_DYNAMO_DB ? '설정됨' : '설정되지 않음',
-  secretAccessKey: process.env.VITE_DYNAMO_SECRET ? '설정됨' : '설정되지 않음'
+  region: "process.env.VITE_DYNAMO_REGION",
+  accessKeyId: "process.env.VITE_DYNAMO_DB" ,
+  secretAccessKey: "process.env.VITE_DYNAMO_SECRET"
 });
 
 module.exports = {
