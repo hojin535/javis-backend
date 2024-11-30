@@ -12,18 +12,12 @@ const {
 } = require("@aws-sdk/client-dynamodb");
 
 const client = new DynamoDBClient({
-  region: process.env.VITE_DYNAMO_REGION,
-  credentials: {
-    accessKeyId: process.env.VITE_DYNAMO_DB, // .env에서 가져온 AWS Access Key ID
-    secretAccessKey: process.env.VITE_DYNAMO_SECRET, // .env에서 가져온 AWS Secret Access Key
-  },
+  region: process.env.VITE_DYNAMO_REGION
 });
 
 // 연결 설정 로깅
 console.log('DynamoDB 설정:', {
-  region: process.env.VITE_DYNAMO_REGION,
-  accessKeyId: process.env.VITE_DYNAMO_DB ,
-  secretAccessKey: process.env.VITE_DYNAMO_SECRET
+  region: process.env.VITE_DYNAMO_REGION
 });
 
 module.exports = {
