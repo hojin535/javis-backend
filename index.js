@@ -50,12 +50,27 @@ app.use("/UserInfo",userInfoRouter);
 const { client, ListTablesCommand } = require('./DynamoDB');
 const testDynamoDB = async () => {
   try {
+    console.log('DynamoDB 연결 테스트 시작...');
     const command = new ListTablesCommand({});
+    console.log('ListTablesCommand 생성됨');
+    
     const response = await client.send(command);
-    console.log('DynamoDB 연결 성공. 테이블 목록:', response.TableNames);
-    return true;
+    console.log('DynamoDB 응답 받음:', response);
+    
+    if (response.TableNames) {
+      console.log('DynamoDB 연결 성공. 테이블 목록:', response.TableNames);
+      return true;
+    } else {
+      console.log('DynamoDB 연결됨, 하지만 테이블이 없습니다.');
+      return true;  // 테이블이 없어도 연결은 성공한 것으로 간주
+    }
   } catch (error) {
-    console.error('DynamoDB 연결 실패:', error.message);
+    console.error('DynamoDB 연결 오류 상세 정보:', {
+      message: error.message,
+      code: error.code,
+      name: error.name,
+      stack: error.stack
+    });
     return false;
   }
 };
@@ -63,20 +78,25 @@ const testDynamoDB = async () => {
 // MySQL과 DynamoDB 연결 확인
 const checkConnections = async () => {
   try {
-    // MySQL 연결 확인
-    connection.connect((err) => {
-      if (err) {
-        console.error("MySQL 연결 실패: ", err);
-        process.exit(1);
-      }
-      console.log("MySQL 연결 성공");
+    // MySQL 연결 확인 (Promise로 변환)
+    await new Promise((resolve, reject) => {
+      connection.connect((err) => {
+        if (err) {
+          console.error("MySQL 연결 실패: ", err);
+          reject(err);
+        }
+        console.log("MySQL 연결 성공");
+        resolve();
+      });
     });
 
     // DynamoDB 연결 확인
+    console.log("DynamoDB 연결 시도 중...");
     const dynamoDBConnected = await testDynamoDB();
+    console.log("DynamoDB 연결 상태:", dynamoDBConnected);
+    
     if (!dynamoDBConnected) {
-      console.error("DynamoDB 연결 실패로 서버를 종료합니다.");
-      process.exit(1);
+      throw new Error("DynamoDB 연결 실패");
     }
 
     // 모든 연결이 성공하면 서버 시작
