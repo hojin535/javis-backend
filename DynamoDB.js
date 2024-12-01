@@ -26,20 +26,14 @@ const {
 } = require("@aws-sdk/client-dynamodb");
 
 const client = new DynamoDBClient({
-  region: process.env.VITE_DYNAMO_REGION || 'us-east-1',
-  credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
-  },
+  region: 'us-east-1',  // 리전 직접 지정
   maxAttempts: 3,
-  requestTimeout: 5000, // 5초 타임아웃
+  requestTimeout: 5000
 });
 
 // 연결 설정 로깅
 console.log('DynamoDB 설정:', {
-  region: process.env.VITE_DYNAMO_REGION || 'us-east-1',
-  hasAccessKey: !!process.env.AWS_ACCESS_KEY_ID,
-  hasSecretKey: !!process.env.AWS_SECRET_ACCESS_KEY
+  region: 'us-east-1'
 });
 
 module.exports = {
