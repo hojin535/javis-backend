@@ -54,7 +54,14 @@ const testDynamoDB = async () => {
     const command = new ListTablesCommand({});
     console.log('ListTablesCommand 생성됨');
     
-    const response = await client.send(command);
+    // 타임아웃 처리 추가
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('DynamoDB 연결 타임아웃')), 10000)
+    );
+    
+    const responsePromise = client.send(command);
+    const response = await Promise.race([responsePromise, timeoutPromise]);
+    
     console.log('DynamoDB 응답 받음:', response);
     
     if (response.TableNames) {
