@@ -87,11 +87,13 @@ const checkConnections = async () => {
   try {
     // MySQL 연결 확인 (Promise로 변환)
     await new Promise((resolve, reject) => {
-      connection.connect((err) => {
+      connection.getConnection((err, conn) => {
         if (err) {
           console.error("MySQL 연결 실패: ", err);
           reject(err);
+          return;
         }
+        conn.release();
         console.log("MySQL 연결 성공");
         resolve();
       });
