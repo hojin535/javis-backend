@@ -27,10 +27,6 @@ const {
 
 const client = new DynamoDBClient({
   region: process.env.VITE_DYNAMO_REGION || 'ap-northeast-2',
-  credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-  }
 });
 
 // 연결 설정 로깅
