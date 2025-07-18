@@ -28,9 +28,11 @@ const generateRefreshToken = (user) => {
 const setCookieOptions = (isRefreshToken = false) => {
   return {
     httpOnly: true,
-    secure: true,
-    sameSite: 'none',
+    secure: false,// todo: 나중에 true로 변경
+    sameSite: 'None',
     maxAge: isRefreshToken ? 7 * 24 * 60 * 60 * 1000 : 15 * 60 * 1000 // 리프레시 토큰: 7일, 액세스 토큰: 15분
+
+    path: '/',
   };
 };
 
