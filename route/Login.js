@@ -30,8 +30,7 @@ const setCookieOptions = (isRefreshToken = false) => {
     httpOnly: true,
     secure: false,// todo: 나중에 true로 변경
     sameSite: 'LAX',//todo: 이것도 나중에 변경
-    maxAge: isRefreshToken ? 7 * 24 * 60 * 60 * 1000 : 15 * 60 * 1000 // 리프레시 토큰: 7일, 액세스 토큰: 15분
-
+    maxAge: isRefreshToken ? 7 * 24 * 60 * 60 * 1000 : 15 * 60 * 1000, // 리프레시 토큰: 7일, 액세스 토큰: 15분
     path: '/',
   };
 };
