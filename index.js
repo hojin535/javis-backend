@@ -18,7 +18,7 @@ const clubInfoRouter = require("./route/userInfo/ClubInfo");
 const awardInfoRouter = require("./route/userInfo/AwardInfo");
 const userInfoRouter = require("./route/userInfo/UserInfo");
 const app = express();
-const port = 8080;
+const port = 5000;
 
 // CORS 설정
 const corsOptions = {
